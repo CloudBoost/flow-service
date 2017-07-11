@@ -8,10 +8,11 @@ var database = require('./config/database');
 var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var session      = require('express-session');
-
+var cors = require('cors');
 
 //============= app level middlewares ================ //
 mongoose.connect(database.localUrl); 	// Connect to local MongoDB instance. A remoteUrl is also available (modulus.io)
+app.use(cors());//Access-Control-Allow-Origin header
 app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser.urlencoded({'extended': true})); // parse application/x-www-form-urlencoded

@@ -2,7 +2,7 @@ const router = require('express').Router();
 const PackageJSON = require('../package.json')
 const services=require('../services');
 const util = require('../util');
-const validate = util.validate();
+const {validate} = util
 
 module.exports = function(){
 
