@@ -128,7 +128,7 @@ module.exports = function() {
                         deferred.reject(err);
                     }
 
-                    if (!obj) {
+                    if (!graph) {
                         console.log("Error finding graph");
                         deferred.reject('Error finding graph');
                     } else {
@@ -162,7 +162,7 @@ module.exports = function() {
                     }
                 
                 } catch(e){
-                        res.status(400).send('NO PACKAGE/COMP FOUND')
+                        deferred.reject("NO Packagae/Comp found");
                     }
                 })
 
@@ -193,7 +193,7 @@ module.exports = function() {
                         deferred.reject(err);
                     }
 
-                    if (!obj) {
+                    if (!graph) {
                         console.log("Error finding graph");
                         deferred.reject('Error finding graph');
                     } 
@@ -219,7 +219,7 @@ module.exports = function() {
                      }
 				} catch(e){
 					console.log(e)
-					res.status(400).send('NO PACKAGE/COMP FOUND')
+					deferred.reject("NO Packagae/Comp found");
 				}
 			})
 
@@ -250,7 +250,7 @@ module.exports = function() {
                         deferred.reject(err);
                     }
 
-                    if (!obj) {
+                    if (!graph) {
                         console.log("Error finding graph");
                         deferred.reject('Error finding graph');
                     } 
@@ -275,7 +275,7 @@ module.exports = function() {
                      }
 				} catch(e){
 					console.log(e)
-					res.status(400).send('NO PACKAGE/COMP FOUND')
+					deferred.reject("NO Packagae/Comp found");
 				}
 			})
 
@@ -306,7 +306,7 @@ module.exports = function() {
                         deferred.reject(err);
                     }
 
-                    if (!obj) {
+                    if (!graph) {
                         console.log("Error finding graph");
                         deferred.reject('Error finding graph');
                     } 
@@ -331,7 +331,7 @@ module.exports = function() {
                      }
 				} catch(e){
 					console.log(e)
-					res.status(400).send('NO PACKAGE/COMP FOUND')
+					deferred.reject("NO Packagae/Comp found");
 				}
 			})
 
@@ -362,7 +362,7 @@ module.exports = function() {
                         deferred.reject(err);
                     }
 
-                    if (!obj) {
+                    if (!graph) {
                         console.log("Error finding graph");
                         deferred.reject('Error finding graph');
                     } 
@@ -387,7 +387,7 @@ module.exports = function() {
                      }
 				} catch(e){
 					console.log(e)
-					res.status(400).send('NO PACKAGE/COMP FOUND')
+					deferred.reject("NO Packagae/Comp found");
 				}
 			})
 

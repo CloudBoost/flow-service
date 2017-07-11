@@ -2,7 +2,7 @@ const router = require('express').Router();
 const PackageJSON = require('../package.json')
 const services=require('../services');
 const util = require('../util');
-const validate = util.validate();
+const {validate} = util;
 
 module.exports = function(){
 
@@ -128,8 +128,8 @@ module.exports = function(){
 	router.put('/graph/node/metadata',function(req,res){
 	
 		//add metdata to node
-		let {grpahId,nodeId,metadata} = req.body;
-		let data =  {grpahId,nodeId,metadata};
+		let {graphId,nodeId,metadata} = req.body;
+		let data =  {graphId,nodeId,metadata};
 
 		if(validate(nodeId,"string"),validate(graphId,"string"),validate(metadata,"object")){
 			
