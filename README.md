@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CloudBoost 
 
 [![Build Status](https://travis-ci.org/CloudBoost/flow-service.svg?branch=master)](https://travis-ci.org/CloudBoost/flow-service)
@@ -42,3 +43,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+=======
+# FLOW_SERVICE
+>>>>>>> a09f18c969a54548e4487c7862d979f25fd35330
