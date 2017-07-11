@@ -12,9 +12,9 @@ CloudBoost is the Complete NoSQL Database Service for your app. **Think of Cloud
  - More - ACL's, User Authentication, Server-less apps and more. 
 
 
-# CloudBoost Floww Service
+# CloudBoost Flow Service
 
-This is a CloudBoost Flo Service.
+This is a CloudBoost Flow Service.
 
 # Running CloudBoost
 
