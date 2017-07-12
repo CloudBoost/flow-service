@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const PackageJSON = require('../package.json')
 const services=require('../services');
+const noflo = require('noflo');
 const util = require('../util');
 const {validate} = util;
 
@@ -20,11 +21,12 @@ module.exports = function(){
 		graph.addEdge("Read",'out','Display','in')
 
 		//send initial data
-		graph.addInitial("models/graph.js","Read","in")
+		graph.addInitial("graph.json","Read","in")
 		// graph.addInitial("testStrings","Display","in")
 
 		//run
 		let network = noflo.createNetwork(graph,function(err,nw){
+			console.log(nw);
 			// nw.connect(function(err) {
 	          // if (err) {
 	          //   return done(err);
@@ -33,6 +35,18 @@ module.exports = function(){
 	        // });
 		})
 		
+	})
+
+	router.get('/test/json',function(req,res){
+		var noflo = require("noflo");
+		noflo.loadFile(__dirname+"\\graph.json", function(err, network) {
+		if (err) {
+			throw err;
+		}
+		console.log("Graph loaded");
+		console.log(network.graph.toDOT());
+		res.send();
+		});
 	})
 
 	router.get('/test/node',function(req,res){

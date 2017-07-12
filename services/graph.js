@@ -2,12 +2,16 @@
 
 var Q = require('q');
 const Graph = require('../models/graph');
-const noflo = require('noflo');
+const services = require('./index');
 
 module.exports = function() {
 
     return {
 
+        //get list of all graphs
+        /*
+        @param :
+        */
         graphList: function() {
 
             console.log("Getting graph list..");
@@ -24,7 +28,7 @@ module.exports = function() {
                     console.log("Cannot get the graphs right now.");
                     deferred.reject('Cannot get the graphs right now.');
                 } else {
-                    console.log("Graph list success");
+                    console.log("Graph list success");  
                     deferred.resolve(data);
                 }
 		})
@@ -37,8 +41,13 @@ module.exports = function() {
                 deferred.reject(err);
             }
 
-            return deferred.promise;
+            return deferred.promise; 
         },
+
+        //create a new graph
+        // @param 	name : name of  the graph
+        // 			type : type of the graphId
+        //			description : desc of the graph
 
         createGraph: function(data){
 
@@ -47,15 +56,11 @@ module.exports = function() {
             var deferred = Q.defer();
 
             try {
-                
+                //create a new graphh
                 let graph = new Graph()
-				//init noflow graph
-				graph.graph = noflo.graph.createGraph(data.name)
-				graph.description = data.description || null;
-				graph.created_on = new Date()
-				graph.type = {
-					type:data.type.toUpperCase()
-				}
+                graph.name = data.name;
+                graph.type = data.type;
+                graph.description = data.description;
                 graph.save((err,obj)=>{
 			    if (err) {
                     console.log("Error in creating graph..");
@@ -71,8 +76,6 @@ module.exports = function() {
                 }
 		})
 
-        
-
             } catch (err) {
                 global.winston.log('error', {
                     "error": String(err),
@@ -84,6 +87,9 @@ module.exports = function() {
             return deferred.promise;
 
         },
+
+        //delete graph object using id
+	    // @param id : graphId
 
         deleteGraph: function(id){
 
@@ -111,297 +117,7 @@ module.exports = function() {
 
             return deferred.promise;
 
-        },
-        
-        addComponent: function(data){
-
-            console.log("add component service");
-            
-            var deferred = Q.defer();
-
-            try {      
-
-                Graph.findOne({_id:data.graphId},(err,graph)=>{
-				try{
-                    if (err) {
-                        console.log("Error finding graph");
-                        deferred.reject(err);
-                    }
-
-                    if (!graph) {
-                        console.log("Error finding graph");
-                        deferred.reject('Error finding graph');
-                    } else {
-
-                        let uri = '../node_modules/'+data.pkg+'/components/'+data.name+'.coffee'
-                        let comp = require(uri)
-                        if(graph.components.length == graph.components.filter(comp => comp.name != data.name).length){
-                            graph.components.push({
-                                name:data.name,
-                                data:comp.getComponent()
-                            })
-                        }
-                        graph.markModified('components')
-                        graph.save((err,obj)=>{
-
-                            if (err) {
-                                console.log("Error adding component to graph");
-                                deferred.reject(err);
-                            }
-
-                            if (!obj) {
-                                console.log("Error adding component to graph");
-                                deferred.reject("Error adding component to graph");
-                            } else {
-                                console.log("Add component success");
-                                deferred.resolve(obj);
-                            }
-
-                        })
-
-                    }
-                
-                } catch(e){
-                        deferred.reject("NO Packagae/Comp found");
-                    }
-                })
-
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
-                deferred.reject(err);
-            }
-
-            return deferred.promise;
-
-        },
-
-        addNode: function(data){
-
-            console.log("add node service");
-            
-            var deferred = Q.defer();
-
-            try {
-                    
-                Graph.findOne({_id:data.graphId},(err,graph)=>{
-				try{
-                   if (err) {
-                        console.log("Error finding graph");
-                        deferred.reject(err);
-                    }
-
-                    if (!graph) {
-                        console.log("Error finding graph");
-                        deferred.reject('Error finding graph');
-                    } 
-                    else{
-                        let nodeId = Math.random().toString(36).substring(7)
-                        Object.setPrototypeOf(graph.graph,noflo.Graph.prototype)
-                        graph.graph.addNode(nodeId,data.name)
-                        graph.markModified('graph')
-                        graph.save((err,obj)=>{
-                            if (err) {
-                                console.log("Error adding node to graph");
-                                deferred.reject(err);
-                            }
-
-                            if (!obj) {
-                                console.log("Error adding node to graph");
-                                deferred.reject("Error adding node to graph");
-                            } else {
-                                console.log("Add node success");
-                                deferred.resolve(obj);
-                            }                        
-                        })
-                     }
-				} catch(e){
-					console.log(e)
-					deferred.reject("NO Packagae/Comp found");
-				}
-			})
-
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
-                deferred.reject(err);
-            }
-
-            return deferred.promise;
-
-        },
-
-        addMetadataToNode: function(data){
-
-            console.log("add node service");
-            
-            var deferred = Q.defer();
-
-            try {
-                    
-                Graph.findOne({_id:data.graphId},(err,graph)=>{
-				try{
-                   if (err) {
-                        console.log("Error finding graph");
-                        deferred.reject(err);
-                    }
-
-                    if (!graph) {
-                        console.log("Error finding graph");
-                        deferred.reject('Error finding graph');
-                    } 
-                    else{
-                        Object.setPrototypeOf(graph.graph,noflo.Graph.prototype)
-                        graph.graph.setNodeMetadata(data.nodeId,data.metadata)
-                        graph.markModified('graph');
-                        graph.save((err,obj)=>{
-                            if (err) {
-                                console.log("Error adding metadata to node");
-                                deferred.reject(err);
-                            }
-
-                            if (!obj) {
-                                console.log("Error adding  metadata to node");
-                                deferred.reject("Error adding  metadata to node");
-                            } else {
-                                console.log("Add metadata success");
-                                deferred.resolve(obj);
-                            }                        
-                        })
-                     }
-				} catch(e){
-					console.log(e)
-					deferred.reject("NO Packagae/Comp found");
-				}
-			})
-
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
-                deferred.reject(err);
-            }
-
-            return deferred.promise;
-
-        },
-
-        addEdge: function(data){
-
-            console.log("add edge service");
-            
-            var deferred = Q.defer();
-
-            try {
-                    
-                Graph.findOne({_id:data.graphId},(err,graph)=>{
-				try{
-                   if (err) {
-                        console.log("Error finding graph");
-                        deferred.reject(err);
-                    }
-
-                    if (!graph) {
-                        console.log("Error finding graph");
-                        deferred.reject('Error finding graph');
-                    } 
-                    else{
-                        Object.setPrototypeOf(graph.graph,noflo.Graph.prototype)
-					    graph.graph.addEdge(data.inNode,data.inPort,data.outNode,data.outPort)
-                        graph.markModified('graph');
-                        graph.save((err,obj)=>{
-                            if (err) {
-                                console.log("Error adding edge to node");
-                                deferred.reject(err);
-                            }
-
-                            if (!obj) {
-                                console.log("Error adding edge to node");
-                                deferred.reject("Error adding edge to node");
-                            } else {
-                                console.log("Add edge success");
-                                deferred.resolve(obj);
-                            }                        
-                        })
-                     }
-				} catch(e){
-					console.log(e)
-					deferred.reject("NO Packagae/Comp found");
-				}
-			})
-
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
-                deferred.reject(err);
-            }
-
-            return deferred.promise;
-
-        },
-
-        deleteEdge: function(data){
-
-            console.log("delete edge service");
-            
-            var deferred = Q.defer();
-
-            try {
-                    
-                Graph.findOne({_id:data.graphId},(err,graph)=>{
-				try{
-                   if (err) {
-                        console.log("Error finding graph");
-                        deferred.reject(err);
-                    }
-
-                    if (!graph) {
-                        console.log("Error finding graph");
-                        deferred.reject('Error finding graph');
-                    } 
-                    else{
-                        Object.setPrototypeOf(graph.graph,noflo.Graph.prototype)
-    					graph.graph.removeEdge(data.inNode,data.inPort,data.outNode,data.outPort)
-                        graph.markModified('graph');
-                        graph.save((err,obj)=>{
-                            if (err) {
-                                console.log("Error deleting edge from node");
-                                deferred.reject(err);
-                            }
-
-                            if (!obj) {
-                                console.log("Error deleting edge from node");
-                                deferred.reject("Error deleting edge from  node");
-                            } else {
-                                console.log("Delete edge success");
-                                deferred.resolve(obj);
-                            }                        
-                        })
-                     }
-				} catch(e){
-					console.log(e)
-					deferred.reject("NO Packagae/Comp found");
-				}
-			})
-
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
-                deferred.reject(err);
-            }
-
-            return deferred.promise;
-
-        }
+        }        
 
     };
 

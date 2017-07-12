@@ -28,6 +28,12 @@ app.use(session({ secret: 'flowuisecret',resave: true,
 app.use('/api',require('./api/graph')())
 app.use('/api',require('./api/test')())
 app.use('/api',require('./api/package')())
+app.get('/status',function(req,res){
+
+		//status api
+
+		res.status(200).send({message:'OK'})
+	})
 
 server.listen(port, function () {
   console.log( "CloudBoost Flow running on :" + port )
