@@ -9,6 +9,7 @@ const util = require('../util');
 const {
     validate
 } = util
+const Flow = require('../node_modules/cbflow-fs/CloudBoostFlow.js');
 
 module.exports = function () {
 
@@ -38,7 +39,7 @@ module.exports = function () {
                         } else {
 
                             //create a new node
-                            var Component = require('../node_modules/' + data.name);
+                            var Component = require('../node_modules/' + data.name)(new Flow.Socket());
                             const id = util.generateId();
                             let component = {
                                 _id: id,
