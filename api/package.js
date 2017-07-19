@@ -23,7 +23,7 @@ module.exports = function () {
 
 	router.get('/package/info/:name', function (req, res) {
 
-		let name=req.params.name;
+		let name = req.params.name;
 
 		services.packageService.getPackageInfo(name).then(function (result) {
 			console.log("Get package info success");

@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
-var graph = mongoose.Schema({
-    name: { //name of the graph
+var schema = mongoose.Schema({
+    name: { //name of the api
         type: String,
         required: true
     },
@@ -14,16 +14,19 @@ var graph = mongoose.Schema({
         type: String,
         required: true
     },
-    nodes: [{
-        type: mongoose.Schema.Types.Mixed,
-        default: [],
+    route: { //route of the api /a/bc/def
+        type: String,
         required: true
-    }],
-    edges: [{
+    },
+    components: {
         type: mongoose.Schema.Types.Mixed,
-        default: [],
+        default: {},
         required: true
-    }]
+    },
+    graphId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'graph'
+    }
 });
 
-module.exports = mongoose.model('graph', graph);
+module.exports = mongoose.model('api', schema);
