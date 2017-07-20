@@ -14,11 +14,11 @@ var graph = mongoose.Schema({
         type: String,
         required: true
     },
-    nodes: [{
+    nodes: {
         type: mongoose.Schema.Types.Mixed,
-        default: [],
+        default: {},
         required: true
-    }],
+    },
     edges: [{
         type: mongoose.Schema.Types.Mixed,
         default: [],

@@ -21,6 +21,7 @@ module.exports = function () {
 			graphId,
 			componentId
 		} = req.body;
+
 		let data = {
 			name,
 			graphId,
@@ -41,8 +42,11 @@ module.exports = function () {
 
 			});
 
-		} else
+		} else {
+
 			res.status(400).send('INVALID REQUEST')
+
+		}
 	})
 
 	//add metadata to existing node
@@ -58,6 +62,7 @@ module.exports = function () {
 			nodeId,
 			metadata
 		} = req.body;
+
 		let data = {
 			graphId,
 			nodeId,
@@ -78,8 +83,11 @@ module.exports = function () {
 
 			});
 
-		} else
+		} else {
+
 			res.status(400).send('INVALID REQUEST')
+
+		}
 	})
 
 	return router

@@ -9,30 +9,31 @@ const {
 module.exports = function () {
 
 	//add edge between 2 nodes in the existinng graph
-	// @param  inNode : id of the input Node
-	//         outNode : id of the output node
-	//         inPort : IN port of the OUTPUT node
-	//         outPort : OUT port of the INPUT node
+	// @param  startNode : id of the start Node
+	//         endNode : id of the end node
+	//         endPort : IN port of the end node
+	//         startPort : OUT port of the start node
 	//         graphId : id of the graph 
 
 	router.put('/graph/edge', function (req, res) {
 
 		let {
-			inNode,
-			outNode,
-			inPort,
-			outPort,
+			startNode,
+			endNode,
+			endPort,
+			startPort,
 			graphId
 		} = req.body;
+
 		let data = {
-			inNode,
-			outNode,
-			inPort,
-			outPort,
+			startNode,
+			endNode,
+			endPort,
+			startPort,
 			graphId
 		};
 
-		if (validate(inNode, "string"), validate(outNode, "string"), validate(inPort, "string"), validate(outPort, "string"), validate(graphId, "string")) {
+		if (validate(startNode, "string"), validate(endNode, "string"), validate(startPort, "string"), validate(endPort, "string"), validate(graphId, "string")) {
 
 			services.edgeService.addEdge(data).then(function (result) {
 
@@ -46,8 +47,11 @@ module.exports = function () {
 
 			});
 
-		} else
+		} else {
+
 			res.status(400).send('INVALID REQUEST')
+
+		}
 	})
 
 	//delete edge form graph
@@ -60,6 +64,7 @@ module.exports = function () {
 			edgeId,
 			graphId
 		} = req.body;
+
 		let data = {
 			edgeId,
 			graphId
@@ -79,7 +84,11 @@ module.exports = function () {
 
 			});
 
-		} else res.status(400).send('INVALID REQUEST')
+		} else {
+
+			res.status(400).send('INVALID REQUEST')
+
+		}
 	})
 
 	return router

@@ -15,11 +15,15 @@ module.exports = function () {
 	router.get('/graph/all', function (req, res) {
 
 		services.graphService.graphList().then(function (result) {
+
 			console.log("Successfull Get Graphs");
 			return res.status(200).json(result);
+
 		}, function (error) {
+
 			console.log("Error getting graph list");
 			return res.send(500, error);
+
 		});
 
 	})
@@ -38,6 +42,7 @@ module.exports = function () {
 			description,
 			apiId
 		} = req.body;
+
 		let data = {
 			name,
 			description,
@@ -57,8 +62,11 @@ module.exports = function () {
 				return res.send(500, error);
 
 			});
-		} else
+		} else {
+
 			res.status(400).send('INVALID REQUEST')
+
+		}
 	})
 
 	//delete graph object using id
@@ -69,6 +77,7 @@ module.exports = function () {
 		let {
 			id
 		} = req.body;
+
 		if (validate(id, "string")) {
 
 			services.graphService.deleteGraph(id).then(function (result) {
@@ -83,8 +92,29 @@ module.exports = function () {
 
 			});
 
-		} else
+		} else {
+
 			res.status(400).send('INVALID REQUEST')
+
+		}
+	})
+
+	//execute graph
+	//@param route:route of the api
+
+	router.post('/graph/execute/:route', function (req, res) {
+
+		services.graphService.executeGraph(req.params.route).then(function (result) {
+
+			console.log("graph executed successfully ");
+			return res.status(200).json(result);
+
+		}, function (error) {
+
+			console.log("Error executing graph");
+			return res.status(500).send(error);
+
+		});
 	})
 
 	return router

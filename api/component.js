@@ -37,8 +37,11 @@ module.exports = function () {
 				return res.send(500, error);
 
 			});
-		} else
+		} else {
+
 			res.status(400).send('INVALID REQUEST')
+
+		}
 	})
 
 	return router

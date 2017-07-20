@@ -1,7 +1,6 @@
 'use strict';
 
 var Q = require('q');
-const Graph = require('../models/graph');
 const services = require('./index');
 const util = require('../util');
 const {
@@ -24,61 +23,35 @@ module.exports = function () {
 
             var deferred = Q.defer();
 
-            try {
+            services.graphService.getGraphById(data.graphId).then((graph) => {
+                //create a new node
+                let node = {
+                    _id: util.generateId(),
+                    name: data.name,
+                    component: data.componentId,
+                    metadata: data.metadata
+                }
+                graph.nodes.push(node);
+                graph.markModified('nodes')
 
-                Graph.findOne({
-                    _id: data.graphId
-                }, (err, graph) => {
-                    try {
-                        if (err) {
-                            console.log("Error finding graph");
-                            deferred.reject(err);
-                        }
+                services.graphService.saveGraph(graph).then((obj) => {
 
-                        if (!graph) {
-                            console.log("Error finding graph");
-                            deferred.reject('Error finding graph');
-                        } else {
+                    console.log("Add node success");
+                    deferred.resolve(obj);
 
-                            //create a new node
-                            let node = {
-                                _id: util.generateId(),
-                                name: data.name,
-                                component: data.componentId,
-                                metadata: data.metadata
-                            }
-                            graph.nodes.push(node);
-                            graph.markModified('nodes')
-                            graph.save((err, obj) => {
-                                if (err) {
-                                    console.log("Error adding node to graph");
-                                    deferred.reject(err);
-                                }
+                }, (err) => {
 
-                                if (!obj) {
-                                    console.log("Error adding node to graph");
-                                    deferred.reject("Error adding node to graph");
-                                } else {
-                                    console.log("Add node success");
-                                    deferred.resolve(obj);
-                                }
-                            })
+                    console.log("Error adding node to graph");
+                    deferred.reject(err);
 
-
-                        }
-                    } catch (e) {
-                        console.log(e)
-                        deferred.reject("NO Packagae/Comp found");
-                    }
                 })
+            }, (err) => {
 
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
+                console.log("Error finding graph");
                 deferred.reject(err);
-            }
+
+            })
+
 
             return deferred.promise;
 
@@ -95,56 +68,33 @@ module.exports = function () {
 
             var deferred = Q.defer();
 
-            try {
+            services.graphService.getGraphById(data.graphId).then((graph) => { //fetch node and add metadat
 
-                Graph.findOne({
-                    _id: data.graphId
-                }, (err, graph) => {
-                    try {
-                        if (err) {
-                            console.log("Error finding graph");
-                            deferred.reject(err);
-                        }
-
-                        if (!graph) {
-                            console.log("Error finding graph");
-                            deferred.reject('Error finding graph');
-                        } else {
-                            //fetch node and add metadat
-                            graph.nodes.forEach((node) => {
-                                if (node._id === data.nodeId) {
-                                    node.metadata = data.metadata;
-                                }
-                            })
-                            graph.markModified('nodes');
-                            graph.save((err, obj) => {
-                                if (err) {
-                                    console.log("Error adding metadata to node");
-                                    deferred.reject(err);
-                                }
-
-                                if (!obj) {
-                                    console.log("Error adding  metadata to node");
-                                    deferred.reject("Error adding  metadata to node");
-                                } else {
-                                    console.log("Add metadata success");
-                                    deferred.resolve(obj);
-                                }
-                            })
-                        }
-                    } catch (e) {
-                        console.log(e)
-                        deferred.reject("NO Packagae/Comp found");
+                graph.nodes.forEach((node) => {
+                    if (node._id === data.nodeId) {
+                        node.metadata = data.metadata;
                     }
                 })
+                graph.markModified('nodes');
 
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
+                services.graphService.saveGraph(graph).then((obj) => {
+
+                    console.log("Add metadata success");
+                    deferred.resolve(obj);
+
+                }, (err) => {
+
+                    console.log("Error adding metadata to node");
+                    deferred.reject(err);
+
+                })
+            }, (err) => {
+
+                console.log("Error finding graph");
                 deferred.reject(err);
-            }
+
+            })
+
 
             return deferred.promise;
 

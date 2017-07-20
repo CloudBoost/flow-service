@@ -9,7 +9,9 @@ const {
 module.exports = function () {
 
     //create new api service
-    // @param  
+    // @param   route : route of the api
+    //          name : name of the api
+    //          description : description of the api
     router.post('/create', function (req, res) {
 
         let {
@@ -38,8 +40,11 @@ module.exports = function () {
 
             });
 
-        } else
+        } else {
+
             res.status(400).send('INVALID REQUEST')
+
+        }
     })
 
     return router

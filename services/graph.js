@@ -2,7 +2,6 @@
 
 var Q = require('q');
 const Graph = require('../models/graph');
-const Api = require('../models/api');
 const services = require('./index');
 
 module.exports = function () {
@@ -16,31 +15,30 @@ module.exports = function () {
         graphList: function () {
 
             console.log("Getting graph list..");
+
             var deferred = Q.defer();
 
-            try {
-                Graph.find({}, (err, data) => {
-                    if (err) {
-                        console.log("Error on getting graphs..");
-                        deferred.reject(err);
-                    }
+            Graph.find({}, (err, data) => {
 
-                    if (!data) {
-                        console.log("Cannot get the graphs right now.");
-                        deferred.reject('Cannot get the graphs right now.');
-                    } else {
-                        console.log("Graph list success");
-                        deferred.resolve(data);
-                    }
-                })
+                if (err) {
 
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
-                deferred.reject(err);
-            }
+                    console.log("Error on getting graphs..");
+                    deferred.reject(err);
+
+                }
+
+                if (!data) {
+
+                    console.log("Cannot get the graphs right now.");
+                    deferred.reject('Cannot get the graphs right now.');
+
+                } else {
+
+                    console.log("Graph list success");
+                    deferred.resolve(data);
+
+                }
+            })
 
             return deferred.promise;
         },
@@ -57,52 +55,42 @@ module.exports = function () {
 
             var deferred = Q.defer();
 
-            try {
-                //get the api
-                Api.findById(data.apiId, (err, api) => {
+            //get the api
+            services.apiService.getApiById(data.apiId).then((api) => { //create a new graphh
 
-                    //create a new graphh
-                    let graph = new Graph()
-                    graph.name = data.name;
-                    graph.description = data.description;
-                    graph.save((err, obj) => {
-                        if (err) {
-                            console.log("Error in creating graph..");
-                            deferred.reject(err);
-                        }
+                let graph = new Graph()
+                graph.name = data.name;
+                graph.description = data.description;
 
-                        if (!obj) {
-                            console.log("Error in creating graph..");
-                            deferred.reject('Error in creating graph..');
-                        } else {
-                            //attach graph to api
-                            api.graphId = obj._id;
-                            api.save((err, obj) => {
-                                if (err) {
-                                    console.log("Error in attaching graph to api..");
-                                    deferred.reject(err);
-                                }
+                services.graphService.saveGraph(graph).then((obj) => {
 
-                                if (!obj) {
-                                    console.log("Error in attaching graph to api..");
-                                    deferred.reject('Error in attaching graph to api..');
-                                } else {
-                                    console.log("Graph attach success");
-                                    deferred.resolve(obj);
+                    api.graphId = obj._id;
+                    services.apiService.saveApi(api).then((obj) => {
 
-                                }
-                            })
-                        }
+                        console.log("Graph attach success");
+                        deferred.resolve(obj);
+
+                    }, (err) => {
+
+                        console.log("Error in attaching graph to api..");
+                        deferred.reject(err);
+
                     })
-                })
+                }, (err) => {
 
-            } catch (err) {
+                    console.log("Error in creating graph..");
+                    deferred.reject('Error in creating graph..');
+
+                })
+            }, (err) => {
+
                 global.winston.log('error', {
                     "error": String(err),
                     "stack": new Error().stack
                 });
                 deferred.reject(err);
-            }
+
+            })
 
             return deferred.promise;
 
@@ -117,25 +105,164 @@ module.exports = function () {
 
             var deferred = Q.defer();
 
-            try {
+            Graph.remove({
+                _id: id
+            }, (err) => {
+                if (err) {
 
-                Graph.remove({
-                    _id: id
+                    console.log("Error in deleting graph..");
+                    deferred.reject(err);
+
+                }
+
+                deferred.resolve('Success');
+            })
+
+            return deferred.promise;
+
+        },
+
+        //execute graph
+
+        executeGraph: function (route) {
+
+            console.log("executes graph service");
+
+            var deferred = Q.defer();
+
+            services.apiService.findOneApi({
+                route
+            }).then((api) => {
+
+                services.graphService.getGraphById(api.graphId).then((graph) => {
+
+                    var socket = require('../node_modules/cbflow-fs/components/End.js')().socket;
+                    socket.setMaxListeners(99999);
+
+                    graph.edges.forEach((edge, i) => {
+
+                        var id = edge.startNode;
+                        var c = require('../node_modules/' + graph.nodes[edge.startNode].path)(socket, id)
+
+                        for (let key in c._inPorts) {
+                            socket.on('data-inport-' + id + '-' + key, function (data) {
+                                socket.emit('execute-' + id, socket);
+                            })
+                        }
+
+                        if (i === 0) {
+                            socket.emit('data-inport-' + id + '-' + 'data', '1234567890')
+                        }
+
+                        var id2 = edge.endNode;
+
+                        if (id2 === graph.edges[graph.edges.length - 1].endNode) {
+
+                            socket.on('result-' + id2, function (data) {
+                                for (let key in socket._events) {
+                                    socket.removeAllListeners(key);
+                                }
+                                try {
+                                    deferred.resolve({
+                                        length: data
+                                    })
+                                } catch (error) {}
+                            })
+                        }
+                        var c2 = require('../node_modules/' + graph.nodes[edge.endNode].path)(socket, id2)
+
+                        for (let key in c2._inPorts) {
+
+                            socket.on('data-inport-' + id2 + '-' + key, function (data) {
+                                socket.emit('execute-' + id2, socket);
+
+                            })
+                        }
+                        socket.on('data-outport-' + id + '-' + edge.startPort, function (data) {
+                            socket.emit('data-inport-' + id2 + '-' + edge.endPort, data);
+                        })
+
+                    })
                 }, (err) => {
-                    if (err) {
-                        console.log("Error in deleting graph..");
-                        deferred.reject(err);
-                    }
-                    deferred.resolve('Success');
-                })
 
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
+                    console.log("Error in getting graph..");
+                    deferred.reject(err);
+
+                })
+            }, (err) => {
+
+                console.log("Error in getting api..");
                 deferred.reject(err);
-            }
+
+            })
+
+            return deferred.promise;
+        },
+
+        //save graph
+        //params @graph : Graph object
+
+        saveGraph: function (graph) {
+            console.log("save graph  service");
+
+            var deferred = Q.defer()
+
+            graph.save((err, obj) => {
+
+                if (err) {
+
+                    console.log("Error in saving graph..");
+                    deferred.reject(err);
+
+                }
+
+                if (!obj) {
+
+                    console.log("Error in saving graph ..");
+                    deferred.reject('Error in saving graph..');
+
+                } else {
+
+                    console.log("Graph save success");
+                    deferred.resolve(obj);
+
+                }
+            })
+
+            return deferred.promise;
+
+        },
+
+        //get Graph by id
+        //params @id: _id of the graph
+
+        getGraphById: function (id) {
+
+            console.log("get graph by id  service");
+
+            var deferred = Q.defer()
+
+            Graph.findById(id, (err, graph) => {
+
+                if (err) {
+
+                    console.log("Error in getting graph..");
+                    deferred.reject(err);
+
+                }
+
+                if (!graph) {
+
+                    console.log("Cannot get the graph right now.");
+                    deferred.reject('Cannot get the graph right now.');
+
+                } else {
+
+                    console.log("get graph success");
+                    deferred.resolve(graph);
+
+                }
+            })
 
             return deferred.promise;
 
