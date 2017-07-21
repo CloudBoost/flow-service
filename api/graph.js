@@ -112,7 +112,7 @@ module.exports = function () {
 		}, function (error) {
 
 			console.log("Error executing graph");
-			return res.status(500).send(error);
+			return res.status(500).send(error.stack);
 
 		});
 	})

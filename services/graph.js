@@ -3,6 +3,7 @@
 var Q = require('q');
 const Graph = require('../models/graph');
 const services = require('./index');
+const vm = require('vm')
 
 module.exports = function () {
 
@@ -146,7 +147,22 @@ module.exports = function () {
 
                         for (let key in c._inPorts) {
                             socket.on('data-inport-' + id + '-' + key, function (data) {
-                                socket.emit('execute-' + id, socket);
+                                // socket.emit('execute-' + id, socket);
+                                var input = c.input;
+                                var output = c.output;
+                                console.time('vm')
+                                try {
+                                    vm.runInNewContext('(' + c.handle.toString() + ')(input,output)', {
+                                        require,
+                                        console,
+                                        input,
+                                        output,
+                                        socket
+                                    });
+                                } catch (error) {
+                                    deferred.reject(error.stack)
+                                }
+                                console.timeEnd('vm')
                             })
                         }
 
@@ -174,7 +190,21 @@ module.exports = function () {
                         for (let key in c2._inPorts) {
 
                             socket.on('data-inport-' + id2 + '-' + key, function (data) {
-                                socket.emit('execute-' + id2, socket);
+                                // socket.emit('execute-' + id2, socket);
+                                var input = c2.input;
+                                var output = c2.output;
+                                console.time('vm')
+                                try {
+                                    vm.runInNewContext('(' + c2.handle.toString() + ')(input,output)', {
+                                        require,
+                                        console,
+                                        input,
+                                        output,
+                                        socket
+                                    });
+                                } catch (error) {
+                                    deferred.reject(error)
+                                }
 
                             })
                         }
