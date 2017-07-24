@@ -1,79 +1,65 @@
 'use strict';
 
 var Q = require('q');
-const Graph = require('../models/graph');
 const services = require('./index');
+const util = require('../util');
+const {
+    validate
+} = util
 
-module.exports = function() {
+module.exports = function () {
 
     return {
 
         //add edge between 2 nodes in the existinng graph
-        // @param  inNode : id of the input Node
-        //         outNode : id of the output node
-        //         inPort : IN port of the OUTPUT node
-        //         outPort : OUT port of the INPUT node
+        // @param  startNode : id of the start Node
+        //         endNode : id of the end node
+        //         endPort : IN port of the end node
+        //         startPort : OUT port of the start node
         //         graphId : id of the graph 
 
-        addEdge: function(data){
+        addEdge: function (data) {
 
             console.log("add edge service");
 
-            
             var deferred = Q.defer();
 
-            try {
-                    
-                Graph.findOne({_id:data.graphId},(err,graph)=>{
-				try{
-                   if (err) {
-                        console.log("Error finding graph");
-                        deferred.reject(err);
-                    }
+            services.graphService.getGraphById(data.graphId).then((graph) => {
 
-                    if (!graph) {
-                        console.log("Error finding graph");
-                        deferred.reject('Error finding graph');
-                    } 
-                    else{
-                        let {inNode,outNode,inPort,outPort} = data;
+                let {
+                    startNode,
+                    endNode,
+                    endPort,
+                    startPort,
+                    graphId
+                } = data;
 
-                        graph.edges.push({
-                            inNode,//id
-                            outNode,//id
-                            inPort,//string
-                            outPort,//string
-                            _id:util.generateId()
-                        })
-                        graph.markModified('edges');
-                        graph.save((err,obj)=>{
-                            if (err) {
-                                console.log("Error adding edge to node");
-                                deferred.reject(err);
-                            }
+                graph.edges.push({
+                    startNode,
+                    endNode,
+                    endPort,
+                    startPort,
+                    _id: util.generateId()
+                })
+                graph.markModified('edges');
 
-                            if (!obj) {
-                                console.log("Error adding edge to node");
-                                deferred.reject("Error adding edge to node");
-                            } else {
-                                console.log("Add edge success");
-                                deferred.resolve(obj);
-                            }                        
-                        })
-                     }
-				} catch(e){
-					console.log(e)
-					deferred.reject("NO Packagae/Comp found");
-				}
-			})
+                services.graphService.saveGraph(graph).then((obj) => {
 
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
+                    console.log("Add edge success");
+                    deferred.resolve(obj);
+
+                }, (err) => {
+
+                    console.log("Error adding edge to node");
+                    deferred.reject("Error adding edge to node");
+
+                })
+            }, (err) => {
+
+                console.log("Error finding graph");
                 deferred.reject(err);
-            }
+
+            })
 
             return deferred.promise;
 
@@ -83,60 +69,39 @@ module.exports = function() {
         // @param  graphId : id of the graphId
         //         edgeId : id of the edge in the graphId
 
-        deleteEdge: function(data){
+        deleteEdge: function (data) {
 
             console.log("delete edge service");
-            
+
             var deferred = Q.defer();
 
-            try {
-                    
-                Graph.findOne({_id:data.graphId},(err,graph)=>{
-				try{
-                   if (err) {
-                        console.log("Error finding graph");
-                        deferred.reject(err);
-                    }
+            services.graphService.getGraphById(data.graphId).then((graph) => {
 
-                    if (!graph) {
-                        console.log("Error finding graph");
-                        deferred.reject('Error finding graph');
-                    } 
-                    else{
-                        graph.edges=graph.edges.filter((edge)=>edge._id!==data.edgeId)
-                        graph.markModified('edges');
-                        graph.save((err,obj)=>{
-                            if (err) {
-                                console.log("Error deleting edge from node");
-                                deferred.reject(err);
-                            }
+                graph.edges = graph.edges.filter((edge) => edge._id !== data.edgeId)
+                graph.markModified('edges');
 
-                            if (!obj) {
-                                console.log("Error deleting edge from node");
-                                deferred.reject("Error deleting edge from  node");
-                            } else {
-                                console.log("Delete edge success");
-                                deferred.resolve(obj);
-                            }                        
-                        })
-                     }
-				} catch(e){
-					console.log(e)
-					deferred.reject("NO Packagae/Comp found");
-				}
-			})
+                services.graphService.saveGraph(graph).then((obj) => {
 
-            } catch (err) {
-                global.winston.log('error', {
-                    "error": String(err),
-                    "stack": new Error().stack
-                });
+                    console.log("Delete edge success");
+                    deferred.resolve(obj);
+
+                }, (err) => {
+
+                    console.log("Error deleting edge to node");
+                    deferred.reject("Error deleting edge to node");
+
+                })
+            }, (err) => {
+
+                console.log("Error finding graph");
                 deferred.reject(err);
-            }
+
+            })
+
 
             return deferred.promise;
 
-        }   
+        }
 
     };
 

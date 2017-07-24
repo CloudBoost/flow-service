@@ -1,70 +1,94 @@
 const router = require('express').Router();
 const PackageJSON = require('../package.json')
-const services=require('../services');
+const services = require('../services');
 const util = require('../util');
-const {validate} = util;
+const {
+	validate
+} = util;
 
-module.exports = function(){
-    
-    //add node to existing graph
-    // @param  name : name of the node which will be displayed on the UI (eg. Add1, Add2)
-    //         graphId : id of the graph
-    //         component : id of the component object 
-    //         metadata : metadata of the node (eg: x,y coordinates)
+module.exports = function () {
 
-	router.put('/graph/node',function(req,res){
+	//add node to existing graph
+	// @param  name : name of the node which will be displayed on the UI (eg. Add1, Add2)
+	//         graphId : id of the graph
+	//         component : id of the component object 
+	//         metadata : metadata of the node (eg: x,y coordinates)
 
-		let {name,graphId} = req.body;
-		let data = {name,graphId}
+	router.put('/graph/node', function (req, res) {
 
-		if(validate(name,"string"),validate(graphId,"string")){
+		let {
+			name,
+			graphId,
+			componentId
+		} = req.body;
 
-			services.nodeService.addNode(data).then(function(result) {
+		let data = {
+			name,
+			graphId,
+			componentId
+		}
+
+		if (validate(name, "string"), validate(graphId, "string")) {
+
+			services.nodeService.addNode(data).then(function (result) {
 
 				console.log("Successfull added node to  Graph");
 				return res.status(200).json(result);
-        
-			},function(error) {
-		
+
+			}, function (error) {
+
 				console.log("Error adding node to graph ");
 				return res.send(500, error);
-		
+
 			});
 
-		} 
-		else
+		} else {
+
 			res.status(400).send('INVALID REQUEST')
+
+		}
 	})
 
-    //add metadata to existing node
-    // @param  graphId : id of the graph
-    //         metadata : metadata of the node (eg: x,y coordinates)
-    //         nodeId : id of the node in the graph
+	//add metadata to existing node
+	// @param  graphId : id of the graph
+	//         metadata : metadata of the node (eg: x,y coordinates)
+	//         nodeId : id of the node in the graph
 
-	router.put('/graph/node/metadata',function(req,res){
-	
+	router.put('/graph/node/metadata', function (req, res) {
+
 		//add metdata to node
-		let {graphId,nodeId,metadata} = req.body;
-		let data =  {graphId,nodeId,metadata};
+		let {
+			graphId,
+			nodeId,
+			metadata
+		} = req.body;
 
-		if(validate(nodeId,"string"),validate(graphId,"string"),validate(metadata,"object")){
-			
-			services.nodeService.addMetadataToNode(data).then(function(result) {
+		let data = {
+			graphId,
+			nodeId,
+			metadata
+		};
+
+		if (validate(nodeId, "string"), validate(graphId, "string"), validate(metadata, "object")) {
+
+			services.nodeService.addMetadataToNode(data).then(function (result) {
 
 				console.log("Successfull added metadata to node");
 				return res.status(200).json(result);
-        
-			},function(error) {
-		
+
+			}, function (error) {
+
 				console.log("Error adding metadata to node");
 				return res.send(500, error);
-		
+
 			});
 
-		} 
-		else 
+		} else {
+
 			res.status(400).send('INVALID REQUEST')
+
+		}
 	})
-	
+
 	return router
 }

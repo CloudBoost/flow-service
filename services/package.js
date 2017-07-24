@@ -1,7 +1,6 @@
 'use strict';
 
 var Q = require('q');
-const Graph = require('../models/graph');
 const services = require('./index');
 const fs = require('fs')
 const path = require('path')
@@ -31,6 +30,7 @@ module.exports = function () {
                 });
                 deferred.reject(err);
             }
+
             return deferred.promise;
 
         },
