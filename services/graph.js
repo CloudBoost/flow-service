@@ -4,6 +4,14 @@ var Q = require('q');
 const Graph = require('../models/graph');
 const services = require('./index');
 const vm = require('vm')
+const child_process = require('child_process');
+const fs = require('fs');
+const {
+    NodeVM,
+    VMScript
+} = require('vm2');
+
+
 
 module.exports = function () {
 
@@ -137,32 +145,102 @@ module.exports = function () {
 
                 services.graphService.getGraphById(api.graphId).then((graph) => {
 
-                    var socket = require('../node_modules/cbflow-fs/components/End.js')().socket;
+                    var socket = require('../node_modules/cbflow-end/components/End.js')().socket;
                     socket.setMaxListeners(99999);
 
                     graph.edges.forEach((edge, i) => {
 
                         var id = edge.startNode;
-                        var c = require('../node_modules/' + graph.nodes[edge.startNode].path)(socket, id)
+                        var packageName = '../node_modules/' + graph.nodes[edge.startNode].path;
+                        var c = require(packageName)(socket, id)
 
                         for (let key in c._inPorts) {
                             socket.on('data-inport-' + id + '-' + key, function (data) {
                                 // socket.emit('execute-' + id, socket);
                                 var input = c.input;
                                 var output = c.output;
-                                console.time('vm')
                                 try {
-                                    vm.runInNewContext('(' + c.handle.toString() + ')(input,output)', {
-                                        require,
-                                        console,
-                                        input,
-                                        output,
-                                        socket
+                                    const vm1 = new NodeVM({
+                                        sandbox: {
+                                            input,
+                                            output
+                                        },
+                                        require: {
+                                            external: true,
+                                            builtin: ['assert',
+                                                'buffer',
+                                                'child_process',
+                                                'cluster',
+                                                'crypto',
+                                                'dgram',
+                                                'dns',
+                                                'domain',
+                                                'events',
+                                                'fs',
+                                                'http',
+                                                'https',
+                                                'net',
+                                                'os',
+                                                'path',
+                                                'punycode',
+                                                'querystring',
+                                                'readline',
+                                                'stream',
+                                                'string_decoder',
+                                                'tls',
+                                                'tty',
+                                                'url',
+                                                'util',
+                                                'v8',
+                                                'vm',
+                                                'zlib'
+                                            ]
+                                        }
                                     });
+                                    const script1 = new VMScript('(' + c.handle.toString() + ')(input,output)');
+                                    vm1.run(script1)
                                 } catch (error) {
-                                    deferred.reject(error.stack)
+                                    console.log(error)
                                 }
-                                console.timeEnd('vm')
+                                // trycomponent
+                                // console.time('vm')
+                                // try {
+                                //     const script = new vm.Script('(' + c.handle.toString() + ')(input,output)');
+                                //     const context = new vm.createContext({
+                                //         console,
+                                //         require,
+                                //         input,
+                                //         output,
+                                //         socket
+                                //     });
+                                //     script.runInNewContext(context);
+                                // } catch (error) {
+                                //     deferred.reject(error.stack)
+                                // }
+                                // console.timeEnd('vm')
+                                // try {
+                                //     fs.mkdir('./executables', (err, fd) => {
+                                //         fs.writeFile('./executables/' + id + '.js', "console.log('saasasa');process.on('message',(data)=>{console.log('1');var component= require(data.packageName)();var socket=data.socket;socket.__proto__=component._socket.__proto__;var input=data.input;input.__proto__=component._input.__proto__;var output=data.output;output.__proto__=component._output.__proto__;" + '(' + c.handle.toString() + ')(input,output)' + "});", 'utf8', (err) => {
+                                //             console.log(err);
+                                //             var child = child_process.fork('./executables/' + id + '.js');
+                                //             child.send({
+                                //                 packageName,
+                                //                 input,
+                                //                 output,
+                                //                 socket
+                                //             });
+                                //             child.on('message', (data) => {
+                                //                 for (key in data) {
+                                //                     socket.emit('data-outport-' + id + '-' + key, data[key]);
+                                //                     output.done();
+                                //                 }
+                                //             })
+                                //         })
+                                //     })
+                                // } catch (error) {
+                                //     console.log(error);
+                                // }
+
                             })
                         }
 
@@ -185,7 +263,8 @@ module.exports = function () {
                                 } catch (error) {}
                             })
                         }
-                        var c2 = require('../node_modules/' + graph.nodes[edge.endNode].path)(socket, id2)
+                        var packageName2 = '../node_modules/' + graph.nodes[edge.endNode].path
+                        var c2 = require(packageName2)(socket, id2)
 
                         for (let key in c2._inPorts) {
 
@@ -193,18 +272,89 @@ module.exports = function () {
                                 // socket.emit('execute-' + id2, socket);
                                 var input = c2.input;
                                 var output = c2.output;
-                                console.time('vm')
                                 try {
-                                    vm.runInNewContext('(' + c2.handle.toString() + ')(input,output)', {
-                                        require,
-                                        console,
-                                        input,
-                                        output,
-                                        socket
+                                    const vm2 = new NodeVM({
+                                        sandbox: {
+                                            input,
+                                            output
+                                        },
+                                        require: {
+                                            external: true,
+                                            builtin: ['assert',
+                                                'buffer',
+                                                'child_process',
+                                                'cluster',
+                                                'crypto',
+                                                'dgram',
+                                                'dns',
+                                                'domain',
+                                                'events',
+                                                'fs',
+                                                'http',
+                                                'https',
+                                                'net',
+                                                'os',
+                                                'path',
+                                                'punycode',
+                                                'querystring',
+                                                'readline',
+                                                'stream',
+                                                'string_decoder',
+                                                'tls',
+                                                'tty',
+                                                'url',
+                                                'util',
+                                                'v8',
+                                                'vm',
+                                                'zlib'
+                                            ]
+                                        }
                                     });
+                                    const script2 = new VMScript('(' + c2.handle.toString() + ')(input,output)');
+                                    vm2.run(script2)
                                 } catch (error) {
-                                    deferred.reject(error)
+                                    console.log(error)
                                 }
+                                // console.time('vm')
+                                // try {
+                                //     const script = new vm.Script('(' + c2.handle.toString() + ')(input,output)');
+                                //     const context = new vm.createContext({
+                                //         require,
+                                //         console,
+                                //         input,
+                                //         output,
+                                //         socket
+                                //     });
+                                //     script.runInNewContext(context);
+
+                                // } catch (error) {
+                                //     deferred.reject(error)
+                                // }
+
+
+                                // try {
+                                //     fs.mkdir('./executables', (err, fd) => {
+                                //         fs.writeFile('./executables/' + id2 + '.js', "console.log('asasa');process.on('message',(data)=>{console.log('1');if(!data.packageName2){return;} console.log(data.packageName2);var component= require(data.packageName2)();var socket=data.socket;socket.__proto__=component._socket.__proto__;var input=data.input;input.__proto__=component._input.__proto__;var output=data.output;output.__proto__=component._output.__proto__;" + '(' + c2.handle.toString() + ')(input,output)' + ";});", 'utf8', (err) => {
+                                //             console.log(err);
+                                //             var child = child_process.fork('./executables/' + id2 + '.js');
+                                //             child.send({
+                                //                 packageName2,
+                                //                 input,
+                                //                 output,
+                                //                 socket
+                                //             });
+                                //             child.on('message', (data) => {
+                                //                 for (key in data) {
+                                //                     socket.emit('data-outport-' + id2 + '-' + key, data[key]);
+                                //                     output.done();
+
+                                //                 }
+                                //             })
+                                //         })
+                                //     })
+                                // } catch (error) {
+                                //     console.log(err)
+                                // }
 
                             })
                         }

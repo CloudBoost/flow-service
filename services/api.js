@@ -22,7 +22,7 @@ module.exports = function () {
             var api = new Api()
             api.name = data.name
             api.description = data.description || 'Awesome API!'
-            api.route = data.route
+            api.route = data.route||'test'
 
             this.saveApi(api).then((obj) => {
 

@@ -26,7 +26,7 @@ module.exports = function () {
             description
         };
 
-        if (validate(route, "string"), validate(name, "string"), validate(description, "string")) {
+        if ( validate(name, "string"), validate(description, "string")) {
 
             services.apiService.createApi(data).then(function (result) {
 

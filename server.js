@@ -12,6 +12,14 @@ var cors = require('cors');
 
 //============= app level middlewares ================ //
 mongoose.connect(database.localUrl); // Connect to local MongoDB instance. A remoteUrl is also available (modulus.io)
+app.use(function (req, res, next) {
+	var start = Date.now();
+	res.on('finish', function () {
+		var duration = Date.now() - start;
+		console.log(duration)
+	});
+	next();
+});
 app.use(cors()); //Access-Control-Allow-Origin header
 app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)

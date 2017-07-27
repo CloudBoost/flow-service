@@ -14,18 +14,20 @@ module.exports = function () {
 	// @param name = name of the component (ReadFile)
 	// @param graphId = id of the graph
 
-	router.put('/component', function (req, res) {
+	router.put('/graph/component', function (req, res) {
 
 		let {
 			name,
-			apiId
+			pkg,
+			graphId
 		} = req.body;
 
 		let data = {
 			name,
-			apiId
+			pkg,
+			graphId
 		}
-		if (validate(name, "string"), validate(apiId, "string")) {
+		if (validate(name, "string"),validate(pkg, "string"), validate(graphId, "string")) {
 			services.componentService.addComponent(data).then(function (result) {
 
 				console.log("Successfull added component to api");

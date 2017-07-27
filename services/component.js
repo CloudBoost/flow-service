@@ -14,28 +14,28 @@ module.exports = function () {
 
         //add component to the API
         //@param    name: complete path of the component in node_modules
-        //          apiId
+        //          graphId
         addComponent: function (data) {
 
             console.log("add node service");
 
             var deferred = Q.defer();
 
-            services.apiService.getApiById(data.apiId).then((api) => { //create a new node
+            services.graphService.getGraphById('5970945f604e2213fc4d5600').then((graph) => { //create a new node
 
-                var Component = require('../node_modules/' + data.name)();
+                var Component = require('../node_modules/' + data.pkg+'/components/'+data.name)();
                 const id = util.generateId();
 
                 let component = {
                     _id: id,
                     name: data.name,
-                    component: Component
+                    data: Component
                 }
 
-                api.components[id] = component;
-                api.markModified('components')
+                graph.components[id] = component;
+                graph.markModified('components')
 
-                services.apiService.saveApi(api).then((obj) => {
+                services.graphService.saveGraph(graph).then((obj) => {
 
                     console.log("Add component success");
                     deferred.resolve(obj);

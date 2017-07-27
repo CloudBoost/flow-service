@@ -103,16 +103,26 @@ module.exports = function () {
 	//@param route:route of the api
 
 	router.post('/graph/execute/:route', function (req, res) {
+		var start = Date.now();
 
 		services.graphService.executeGraph(req.params.route).then(function (result) {
 
 			console.log("graph executed successfully ");
-			return res.status(200).json(result);
+			var duration = Date.now() - start;
+			console.log('d', duration)
+			return res.status(200).json({
+				duration: Date.now() - start,
+				result
+			});
 
 		}, function (error) {
 
 			console.log("Error executing graph");
-			return res.status(500).send(error.stack);
+			var duration = Date.now() - start;
+			return res.status(500).json({
+				duration,
+				error: error
+			});
 
 		});
 	})
