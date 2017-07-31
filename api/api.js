@@ -17,22 +17,29 @@ module.exports = function () {
         let {
             route,
             name,
-            description
+            description,
+            type
         } = req.body;
 
         let data = {
             route,
             name,
-            description
+            description,
+            type
         };
 
-        if ( validate(name, "string"), validate(description, "string")) {
+        if (validate(name, "string"), validate(description, "string")) {
 
             services.apiService.createApi(data).then(function (result) {
-
-                console.log("Successfull created api");
-                return res.status(200).json(result);
-
+                data.apiId = result._id;
+                console.log("Attaching graph");
+                services.graphService.createGraph(data).then((result) => {
+                    console.log("Successfull created api");
+                    return res.status(200).json(result);
+                }).catch(err => {
+                    console.log("Error creating api");
+                    return res.send(500, error);
+                })
             }, function (error) {
 
                 console.log("Error creating api");

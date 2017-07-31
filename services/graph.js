@@ -69,7 +69,9 @@ module.exports = function () {
 
                 let graph = new Graph()
                 graph.name = data.name;
+                graph.graph={name:data.name};
                 graph.description = data.description;
+                graph.type={type:data.type};
 
                 services.graphService.saveGraph(graph).then((obj) => {
 
@@ -151,7 +153,7 @@ module.exports = function () {
                     graph.edges.forEach((edge, i) => {
 
                         var id = edge.startNode;
-                        var packageName = '../node_modules/' + graph.nodes[edge.startNode].path;
+                        var packageName = '../node_modules/' + graph.nodes[edge.startNode].pkg+'/components/'+graph.nodes[edge.startNode].name;
                         var c = require(packageName)(socket, id)
 
                         for (let key in c._inPorts) {
@@ -263,7 +265,7 @@ module.exports = function () {
                                 } catch (error) {}
                             })
                         }
-                        var packageName2 = '../node_modules/' + graph.nodes[edge.endNode].path
+                        var packageName2 = '../node_modules/' + graph.nodes[edge.endNode].pkg+'/components/'+graph.nodes[edge.endNode].name;
                         var c2 = require(packageName2)(socket, id2)
 
                         for (let key in c2._inPorts) {

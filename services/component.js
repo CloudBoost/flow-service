@@ -21,15 +21,16 @@ module.exports = function () {
 
             var deferred = Q.defer();
 
-            services.graphService.getGraphById('5970945f604e2213fc4d5600').then((graph) => { //create a new node
+            services.graphService.getGraphById(data.graphId).then((graph) => { //create a new node
 
-                var Component = require('../node_modules/' + data.pkg+'/components/'+data.name)();
+                var Component = require('../node_modules/' + data.pkg + '/components/' + data.name)();
                 const id = util.generateId();
 
                 let component = {
                     _id: id,
                     name: data.name,
-                    data: Component
+                    data: Component,
+                    pkg: data.pkg
                 }
 
                 graph.components[id] = component;

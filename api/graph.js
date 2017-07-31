@@ -49,7 +49,7 @@ module.exports = function () {
 			apiId
 		};
 
-		if (validate(name, "string"), validate(description, "string"), validate(apiId, "string")) {
+		if (validate(name, "string"), validate(description, "string")) {
 
 			services.graphService.createGraph(data).then(function (result) {
 

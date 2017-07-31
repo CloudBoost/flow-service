@@ -26,6 +26,11 @@ var schema = mongoose.Schema({
     graphId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'graph'
+    },
+    requestType: {
+        type: String,
+        required: true,
+        default: 'GET'
     }
 });
 

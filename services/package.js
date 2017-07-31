@@ -48,16 +48,18 @@ module.exports = function () {
 
                 fs.readdir('./node_modules/' + name + '/components', (err, files) => {
                     //filter js files 
-                    let components={};
+                    let components = {};
                     if (err) {
                         deferred.reject(err);
                     }
                     if (files) {
-                        files.forEach((file)=>{
-                            components[file]=file;
+                        files.forEach((file) => {
+                            components[file] = file;
                         })
-                        
-                        deferred.resolve({components});
+
+                        deferred.resolve({
+                            components
+                        });
                     }
                 })
 

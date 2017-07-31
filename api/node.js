@@ -19,13 +19,15 @@ module.exports = function () {
 		let {
 			name,
 			graphId,
-			componentId
+			componentId,
+			pkg
 		} = req.body;
 
 		let data = {
 			name,
 			graphId,
-			componentId
+			componentId,
+			pkg
 		}
 
 		if (validate(name, "string"), validate(graphId, "string")) {
