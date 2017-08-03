@@ -28,6 +28,26 @@ module.exports = function () {
 
 	})
 
+	//get graph by id
+	/*
+	@param : graphId
+	*/
+	router.post('/graph/:graphId', function (req, res) {
+
+		services.graphService.getGraphById(req.params.graphId).then(function (result) {
+
+			console.log("Successfull Get Graph");
+			return res.status(200).json(result);
+
+		}, function (error) {
+
+			console.log("Error getting graph ");
+			return res.send(500, error);
+
+		});
+
+	})
+
 	//create a new graph
 	// @param 	name : name of  the graph
 	// 			type : type of the graphId

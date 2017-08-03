@@ -3,6 +3,7 @@
 var Q = require('q');
 const Api = require('../models/api');
 const services = require('./index');
+const util = require('../util');
 
 module.exports = function () {
 
@@ -22,7 +23,8 @@ module.exports = function () {
             var api = new Api()
             api.name = data.name
             api.description = data.description || 'Awesome API!'
-            api.route = data.route||'test'
+            api.route = data.route||util.generateId();
+            api.type=data.type
 
             this.saveApi(api).then((obj) => {
 
@@ -140,6 +142,99 @@ module.exports = function () {
 
                 }
             })
+
+            return deferred.promise;
+
+        },
+
+        //get all api
+        //params @document : api object
+
+        apiList: function () {
+            console.log("getting all apis");
+
+            var deferred = Q.defer();
+
+            Api.find({}, (err, data) => {
+
+                if (err) {
+
+                    console.log("Error on getting apis..");
+                    deferred.reject(err);
+
+                }
+
+                if (!data) {
+
+                    console.log("Cannot get the apisgraphs right now.");
+                    deferred.reject('Cannot get the apis right now.');
+
+                } else {
+
+                    console.log("Api list success");
+                    deferred.resolve(data);
+
+                }
+            })
+
+
+            return deferred.promise;
+
+        },
+
+        //get all api
+        //params @document : api object
+
+        updateApi: function (data) {
+            console.log("updating api");
+
+            var deferred = Q.defer();
+
+            Api.findByIdAndUpdate(data._id,data,{new:true}, (err, data) => {
+
+                if (err) {
+
+                    console.log("Error on getting apis..");
+                    deferred.reject(err);
+
+                }
+
+                if (!data) {
+
+                    console.log("Cannot get the apisgraphs right now.");
+                    deferred.reject('Cannot get the apis right now.');
+
+                } else {
+
+                    console.log("Api list success");
+                    deferred.resolve(data);
+
+                }
+            })
+
+
+            return deferred.promise;
+
+        },
+
+        //get api by route
+        //params @route : route
+
+        getApiByRoute: function (route) {
+            console.log("updating api");
+
+            var deferred = Q.defer();
+
+            this.findOneApi({route}).then((api)=>{
+                console.log("Get api by route route success")
+                deferred.resolve(api);
+            }, (err) => {
+
+                console.log("Error in getting api..");
+                deferred.reject(err);
+
+            })
+
 
             return deferred.promise;
 

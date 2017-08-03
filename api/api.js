@@ -54,5 +54,66 @@ module.exports = function () {
         }
     })
 
+     //get all apis
+    // @param   
+    router.get('/all', function (req, res) {
+
+          services.apiService.apiList().then(function (result) {
+
+			console.log("Successfull Get apis");
+			return res.status(200).json(result);
+
+		}, function (error) {
+
+			console.log("Error getting api list");
+			return res.send(500, error);
+
+		});
+    })
+    //get all apis
+    // @param   
+    router.post('/route/:route', function (req, res) {
+
+          services.apiService.getApiByRoute(req.params.route).then(function (result) {
+
+			console.log("Successfull get api by route");
+            services.graphService.getGraphById(result.graphId).then(function (graph) {
+
+                return res.status(200).json(graph);
+
+            }, function (error) {
+
+                console.log("Error getting api list");
+                return res.send(500, error);
+
+            });
+
+		}, function (error) {
+
+			console.log("Error getting api list");
+			return res.send(500, error);
+
+		});
+    })
+
+    //update api
+    // @param  api object
+    router.put('/update', function (req, res) {
+
+            let api=req.body;
+            console.log(api);
+          services.apiService.updateApi(api).then(function (result) {
+
+			console.log("Successfull Get apis");
+			return res.status(200).json(result);
+
+		}, function (error) {
+
+			console.log("Error getting api list");
+			return res.send(500, error);
+
+		});
+    })
+
     return router
 }

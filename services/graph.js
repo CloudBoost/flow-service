@@ -146,6 +146,7 @@ module.exports = function () {
             }).then((api) => {
 
                 services.graphService.getGraphById(api.graphId).then((graph) => {
+                    try{
 
                     var socket = require('../node_modules/cbflow-end/components/End.js')().socket;
                     socket.setMaxListeners(99999);
@@ -365,7 +366,12 @@ module.exports = function () {
                         })
 
                     })
-                }, (err) => {
+                }
+                catch(err){
+                     console.log("Error while executing api");
+                    deferred.reject(err);
+                }
+            }, (err) => {
 
                     console.log("Error in getting graph..");
                     deferred.reject(err);

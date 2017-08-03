@@ -30,7 +30,7 @@ module.exports = function () {
                     _id: util.generateId(),
                     name: data.name,
                     component: data.componentId,
-                    metadata: data.metadata,pkg:data.pkg
+                    metadata: data.metadata||{top:36,left:1},pkg:data.pkg
                 }
                 graph.nodes[node._id] = node;
                 graph.markModified('nodes')
