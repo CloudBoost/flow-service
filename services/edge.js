@@ -30,7 +30,7 @@ module.exports = function () {
                     startNode,
                     endNode,
                     endPort,
-                    startPort,
+                    startPort,i,x1,x2,y1,y2
                 } = data;
 
                 graph.edges.push({
@@ -38,7 +38,7 @@ module.exports = function () {
                     endNode,
                     endPort,
                     startPort,
-                    _id: startNode+startPort+endNode+endPort
+                    _id: startNode+startPort+endNode+endPort,i,x1,x2,y1,y2
                 })
                 graph.markModified('edges');
 

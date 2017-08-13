@@ -30,7 +30,7 @@ module.exports = function () {
                     _id: util.generateId(),
                     name: data.name,
                     component: data.componentId,
-                    metadata: data.metadata||{top:36,left:1},pkg:data.pkg
+                    metadata: data.metadata||{x:0,y:0},pkg:data.pkg
                 }
                 graph.nodes[node._id] = node;
                 graph.markModified('nodes')
@@ -71,7 +71,7 @@ module.exports = function () {
 
             services.graphService.getGraphById(data.graphId).then((graph) => { //fetch node and add metadat
 
-                graph.nodes[data.nodeId].metadata = data.metadata;
+                graph.nodes[data.nodeId].metadata = {x:data.x,y:data.y};
                 graph.markModified('nodes');
 
                 services.graphService.saveGraph(graph).then((obj) => {
