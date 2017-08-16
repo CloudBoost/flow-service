@@ -9,9 +9,9 @@ var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var cors = require('cors');
-
+ var env = process.env.isHosted || false;
 //============= app level middlewares ================ //
-mongoose.connect(database.localUrl); // Connect to local MongoDB instance. A remoteUrl is also available (modulus.io)
+mongoose.connect(env?database.remoteUrl:database.localUrl);
 app.use(function (req, res, next) {
 	var start = Date.now();
 	res.on('finish', function () {
