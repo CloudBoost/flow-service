@@ -22,7 +22,7 @@ module.exports = function () {
 			endNode,
 			endPort,
 			startPort,
-			graphId,i,x1,x2,y1,y2
+			graphId,endi,starti,x1,x2,y1,y2
 		} = req.body;
 
 		let data = {
@@ -30,7 +30,7 @@ module.exports = function () {
 			endNode,
 			endPort,
 			startPort,
-			graphId,i,x1,x2,y1,y2
+			graphId,endi,starti,x1,x2,y1,y2
 		};
 
 		if (validate(startNode, "string"), validate(endNode, "string"), validate(startPort, "string"), validate(endPort, "string"), validate(graphId, "string")) {
