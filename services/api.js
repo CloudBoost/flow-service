@@ -23,8 +23,8 @@ module.exports = function () {
             var api = new Api()
             api.name = data.name
             api.description = data.description || 'Awesome API!'
-            api.route = data.route||util.generateId();
-            api.type=data.type
+            api.route = data.route || util.generateId();
+            api.type = data.type
 
             this.saveApi(api).then((obj) => {
 
@@ -190,7 +190,7 @@ module.exports = function () {
 
             var deferred = Q.defer();
 
-            Api.findByIdAndUpdate(data._id,data,{new:true}, (err, data) => {
+            Api.findByIdAndUpdate(data._id, data, { new: true }, (err, data) => {
 
                 if (err) {
 
@@ -225,7 +225,7 @@ module.exports = function () {
 
             var deferred = Q.defer();
 
-            this.findOneApi({route}).then((api)=>{
+            this.findOneApi({ route }).then((api) => {
                 console.log("Get api by route route success")
                 deferred.resolve(api);
             }, (err) => {

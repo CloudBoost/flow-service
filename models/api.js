@@ -22,7 +22,7 @@ var schema = mongoose.Schema({
         type: mongoose.Schema.Types.Mixed,
         default: {},
         required: true
-    },type: {
+    }, type: {
         type: String,
         default: "API",
         required: true

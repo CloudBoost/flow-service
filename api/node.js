@@ -62,13 +62,13 @@ module.exports = function () {
 		let {
 			graphId,
 			nodeId,
-			x,y
+			x, y
 		} = req.body;
 
 		let data = {
 			graphId,
 			nodeId,
-			x,y
+			x, y
 		};
 
 		if (validate(nodeId, "string"), validate(graphId, "string")) {

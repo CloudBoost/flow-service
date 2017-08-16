@@ -30,7 +30,7 @@ module.exports = function () {
                     startNode,
                     endNode,
                     endPort,
-                    startPort,endi,starti,x1,x2,y1,y2
+                    startPort, endi, starti, x1, x2, y1, y2
                 } = data;
 
                 graph.edges.push({
@@ -38,7 +38,7 @@ module.exports = function () {
                     endNode,
                     endPort,
                     startPort,
-                    _id: startNode+startPort+endNode+endPort,endi,starti,x1,x2,y1,y2
+                    _id: startNode + startPort + endNode + endPort, endi, starti, x1, x2, y1, y2
                 })
                 graph.markModified('edges');
 
@@ -79,7 +79,7 @@ module.exports = function () {
                 let filteredEdges = graph.edges.filter((edge) => {
                     return edge._id !== data.edgeId
                 })
-                graph.edges=filteredEdges
+                graph.edges = filteredEdges
                 graph.markModified('edges');
 
                 services.graphService.saveGraph(graph).then((obj) => {
