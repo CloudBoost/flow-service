@@ -47,17 +47,19 @@ module.exports = function () {
             try {
 
                 fs.readdir('./node_modules/' + name + '/components', (err, files) => {
-                    //filter js files
+                    //filter js files 
+                    let components = {};
                     if (err) {
                         deferred.reject(err);
                     }
                     if (files) {
-                        var components = files.filter((element) => {
-                            var extName = path.extname(element);
-                            return extName === '.js';
+                        files.forEach((file) => {
+                            components[file] = file;
                         })
 
-                        deferred.resolve(components);
+                        deferred.resolve({
+                            components
+                        });
                     }
                 })
 

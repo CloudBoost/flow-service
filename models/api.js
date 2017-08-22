@@ -22,10 +22,19 @@ var schema = mongoose.Schema({
         type: mongoose.Schema.Types.Mixed,
         default: {},
         required: true
+    }, type: {
+        type: String,
+        default: "API",
+        required: true
     },
     graphId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'graph'
+    },
+    requestType: {
+        type: String,
+        required: true,
+        default: 'POST'
     }
 });
 

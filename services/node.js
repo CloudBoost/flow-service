@@ -25,13 +25,14 @@ module.exports = function () {
 
             services.graphService.getGraphById(data.graphId).then((graph) => {
                 //create a new node
+
                 let node = {
                     _id: util.generateId(),
                     name: data.name,
                     component: data.componentId,
-                    metadata: data.metadata
+                    metadata: data.metadata || { x: 0, y: 0 }, pkg: data.pkg
                 }
-                graph.nodes.push(node);
+                graph.nodes[node._id] = node;
                 graph.markModified('nodes')
 
                 services.graphService.saveGraph(graph).then((obj) => {
@@ -70,11 +71,7 @@ module.exports = function () {
 
             services.graphService.getGraphById(data.graphId).then((graph) => { //fetch node and add metadat
 
-                graph.nodes.forEach((node) => {
-                    if (node._id === data.nodeId) {
-                        node.metadata = data.metadata;
-                    }
-                })
+                graph.nodes[data.nodeId].metadata = { x: data.x, y: data.y };
                 graph.markModified('nodes');
 
                 services.graphService.saveGraph(graph).then((obj) => {

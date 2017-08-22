@@ -4,24 +4,15 @@ const services = require('../services');
 const noflo = require('noflo');
 const Graph = require('../models/graph');
 const Api = require('../models/api');
-const Flow = require('../node_modules/cbflow-fs/CloudBoostFlow.js');
-
+const child_process = require('child_process');
 
 module.exports = function () {
 
 	router.post('/test', function (req, res) {
-		var util = require('util');
-		var vm = require('vm');
-		var sandbox = {
-			e: null
-		};
-		var src = 'try{count += 1;}catch(err) {e=err.stack}';
-
-		vm.runInNewContext(src, sandbox, {
-			filename: 'myfile.vm',
-			displayErrors: true
-		});
-		console.log(util.inspect(sandbox));
+		var child = child_process.fork('./executables/child.js');
+		child.on('message', (d) => {
+			res.send(d);
+		})
 	})
 
 	return router

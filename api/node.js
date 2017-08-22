@@ -19,13 +19,15 @@ module.exports = function () {
 		let {
 			name,
 			graphId,
-			componentId
+			componentId,
+			pkg
 		} = req.body;
 
 		let data = {
 			name,
 			graphId,
-			componentId
+			componentId,
+			pkg
 		}
 
 		if (validate(name, "string"), validate(graphId, "string")) {
@@ -60,16 +62,16 @@ module.exports = function () {
 		let {
 			graphId,
 			nodeId,
-			metadata
+			x, y
 		} = req.body;
 
 		let data = {
 			graphId,
 			nodeId,
-			metadata
+			x, y
 		};
 
-		if (validate(nodeId, "string"), validate(graphId, "string"), validate(metadata, "object")) {
+		if (validate(nodeId, "string"), validate(graphId, "string")) {
 
 			services.nodeService.addMetadataToNode(data).then(function (result) {
 

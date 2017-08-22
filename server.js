@@ -9,27 +9,29 @@ var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var cors = require('cors');
-
+var env = process.env.isHosted || false;
 //============= app level middlewares ================ //
-mongoose.connect(database.localUrl); // Connect to local MongoDB instance. A remoteUrl is also available (modulus.io)
+mongoose.connect(env
+	? database.remoteUrl
+	: database.localUrl);
+app.use(function (req, res, next) {
+	var start = Date.now();
+	res.on('finish', function () {
+		var duration = Date.now() - start;
+		console.log(duration)
+	});
+	next();
+});
 app.use(cors()); //Access-Control-Allow-Origin header
 app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
-app.use(bodyParser.urlencoded({
-	'extended': true
-})); // parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ 'extended': true })); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
-app.use(bodyParser.json({
-	type: 'application/vnd.api+json'
-})); // parse application/vnd.api+json as json
+app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(express.static('public'));
 
 //============ session ============//
-app.use(session({
-	secret: 'flowuisecret',
-	resave: true,
-	saveUninitialized: true
-})); // session secret
+app.use(session({ secret: 'flowuisecret', resave: true, saveUninitialized: true })); // session secret
 
 // ============ Add Routes =========== //
 app.use('/api', require('./api/graph')())
@@ -44,9 +46,9 @@ app.get('/status', function (req, res) {
 
 	//status api
 
-	res.status(200).send({
-		message: 'OK'
-	})
+	res
+		.status(200)
+		.send({ message: 'OK' })
 })
 
 server.listen(port, function () {

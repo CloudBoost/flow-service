@@ -23,7 +23,19 @@ var graph = mongoose.Schema({
         type: mongoose.Schema.Types.Mixed,
         default: [],
         required: true
-    }]
+    }],
+    components: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {},
+        required: true,
+        default: {}
+    },
+    type: {
+        type: mongoose.Schema.Types.Mixed
+    },
+    graph: {
+        type: mongoose.Schema.Types.Mixed
+    }
 });
 
 module.exports = mongoose.model('graph', graph);
