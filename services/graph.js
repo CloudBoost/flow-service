@@ -10,6 +10,8 @@ const {
     NodeVM,
     VMScript
 } = require('vm2');
+const { builtInNpmPackages } = require('../util')
+const _ = require('underscore')
 
 
 
@@ -150,15 +152,32 @@ module.exports = function () {
 
                         var socket = require('../node_modules/cbflow-end/components/End.js')().socket;
                         socket.setMaxListeners(99999);
+                        var endComponentId = null, startComponentId = null;
+
+                        Object.keys(graph.nodes).forEach((node) => {
+                            if (graph.nodes[node].pkg === 'cbflow-end') {
+                                endComponentId = graph.nodes[node]._id;
+                            }
+                            else if (graph.nodes[node].pkg === 'cbflow-start') {
+                                startComponentId = graph.nodes[node]._id;
+                            }
+
+                        })
 
                         graph.edges.forEach((edge, i) => {
 
                             var id = edge.startNode;
                             var packageName = '../node_modules/' + graph.nodes[edge.startNode].pkg + '/components/' + graph.nodes[edge.startNode].name;
-                            var c = require(packageName)(socket, id)
+
+                            var c = require(packageName)(socket, id, _.where(graph.edges, { endNode: id }))
 
                             for (let key in c._inPorts) {
                                 socket.on('data-inport-' + id + '-' + key, function (data) {
+
+                                    /*
+                                    * to debug uncomment ' socket.emit('execute-' + id, socket);' and comment vm logic;
+                                    */
+
                                     // socket.emit('execute-' + id, socket);
                                     var input = c.input;
                                     var output = c.output;
@@ -170,34 +189,7 @@ module.exports = function () {
                                             },
                                             require: {
                                                 external: true,
-                                                builtin: ['assert',
-                                                    'buffer',
-                                                    'child_process',
-                                                    'cluster',
-                                                    'crypto',
-                                                    'dgram',
-                                                    'dns',
-                                                    'domain',
-                                                    'events',
-                                                    'fs',
-                                                    'http',
-                                                    'https',
-                                                    'net',
-                                                    'os',
-                                                    'path',
-                                                    'punycode',
-                                                    'querystring',
-                                                    'readline',
-                                                    'stream',
-                                                    'string_decoder',
-                                                    'tls',
-                                                    'tty',
-                                                    'url',
-                                                    'util',
-                                                    'v8',
-                                                    'vm',
-                                                    'zlib'
-                                                ]
+                                                builtin: builtInNpmPackages
                                             }
                                         });
                                         const script1 = new VMScript('(' + c.handle.toString() + ')(input,output)');
@@ -205,57 +197,14 @@ module.exports = function () {
                                     } catch (error) {
                                         console.log(error)
                                     }
-                                    // trycomponent
-                                    // console.time('vm')
-                                    // try {
-                                    //     const script = new vm.Script('(' + c.handle.toString() + ')(input,output)');
-                                    //     const context = new vm.createContext({
-                                    //         console,
-                                    //         require,
-                                    //         input,
-                                    //         output,
-                                    //         socket
-                                    //     });
-                                    //     script.runInNewContext(context);
-                                    // } catch (error) {
-                                    //     deferred.reject(error.stack)
-                                    // }
-                                    // console.timeEnd('vm')
-                                    // try {
-                                    //     fs.mkdir('./executables', (err, fd) => {
-                                    //         fs.writeFile('./executables/' + id + '.js', "console.log('saasasa');process.on('message',(data)=>{console.log('1');var component= require(data.packageName)();var socket=data.socket;socket.__proto__=component._socket.__proto__;var input=data.input;input.__proto__=component._input.__proto__;var output=data.output;output.__proto__=component._output.__proto__;" + '(' + c.handle.toString() + ')(input,output)' + "});", 'utf8', (err) => {
-                                    //             console.log(err);
-                                    //             var child = child_process.fork('./executables/' + id + '.js');
-                                    //             child.send({
-                                    //                 packageName,
-                                    //                 input,
-                                    //                 output,
-                                    //                 socket
-                                    //             });
-                                    //             child.on('message', (data) => {
-                                    //                 for (key in data) {
-                                    //                     socket.emit('data-outport-' + id + '-' + key, data[key]);
-                                    //                     output.done();
-                                    //                 }
-                                    //             })
-                                    //         })
-                                    //     })
-                                    // } catch (error) {
-                                    //     console.log(error);
-                                    // }
-
                                 })
-                            }
-
-                            if (i === 0) {
-                                socket.emit('data-inport-' + id + '-' + 'data', '1234567890')
                             }
 
                             var id2 = edge.endNode;
 
-                            if (id2 === graph.edges[graph.edges.length - 1].endNode) {
 
-                                socket.on('result-' + id2, function (data) {
+                            if (id2 === endComponentId) {
+                                socket.on('result-' + endComponentId, function (data) {
                                     for (let key in socket._events) {
                                         socket.removeAllListeners(key);
                                     }
@@ -266,12 +215,19 @@ module.exports = function () {
                                     } catch (error) { }
                                 })
                             }
+
+
                             var packageName2 = '../node_modules/' + graph.nodes[edge.endNode].pkg + '/components/' + graph.nodes[edge.endNode].name;
-                            var c2 = require(packageName2)(socket, id2)
+                            var c2 = require(packageName2)(socket, id2, _.where(graph.edges, { endNode: id2 }))
 
                             for (let key in c2._inPorts) {
 
                                 socket.on('data-inport-' + id2 + '-' + key, function (data) {
+
+                                    /*
+                                    * to debug uncomment ' socket.emit('execute-' + id2, socket);' and comment vm logic;
+                                    */
+
                                     // socket.emit('execute-' + id2, socket);
                                     var input = c2.input;
                                     var output = c2.output;
@@ -283,34 +239,7 @@ module.exports = function () {
                                             },
                                             require: {
                                                 external: true,
-                                                builtin: ['assert',
-                                                    'buffer',
-                                                    'child_process',
-                                                    'cluster',
-                                                    'crypto',
-                                                    'dgram',
-                                                    'dns',
-                                                    'domain',
-                                                    'events',
-                                                    'fs',
-                                                    'http',
-                                                    'https',
-                                                    'net',
-                                                    'os',
-                                                    'path',
-                                                    'punycode',
-                                                    'querystring',
-                                                    'readline',
-                                                    'stream',
-                                                    'string_decoder',
-                                                    'tls',
-                                                    'tty',
-                                                    'url',
-                                                    'util',
-                                                    'v8',
-                                                    'vm',
-                                                    'zlib'
-                                                ]
+                                                builtin: builtInNpmPackages
                                             }
                                         });
                                         const script2 = new VMScript('(' + c2.handle.toString() + ')(input,output)');
@@ -318,52 +247,15 @@ module.exports = function () {
                                     } catch (error) {
                                         console.log(error)
                                     }
-                                    // console.time('vm')
-                                    // try {
-                                    //     const script = new vm.Script('(' + c2.handle.toString() + ')(input,output)');
-                                    //     const context = new vm.createContext({
-                                    //         require,
-                                    //         console,
-                                    //         input,
-                                    //         output,
-                                    //         socket
-                                    //     });
-                                    //     script.runInNewContext(context);
-
-                                    // } catch (error) {
-                                    //     deferred.reject(error)
-                                    // }
-
-
-                                    // try {
-                                    //     fs.mkdir('./executables', (err, fd) => {
-                                    //         fs.writeFile('./executables/' + id2 + '.js', "console.log('asasa');process.on('message',(data)=>{console.log('1');if(!data.packageName2){return;} console.log(data.packageName2);var component= require(data.packageName2)();var socket=data.socket;socket.__proto__=component._socket.__proto__;var input=data.input;input.__proto__=component._input.__proto__;var output=data.output;output.__proto__=component._output.__proto__;" + '(' + c2.handle.toString() + ')(input,output)' + ";});", 'utf8', (err) => {
-                                    //             console.log(err);
-                                    //             var child = child_process.fork('./executables/' + id2 + '.js');
-                                    //             child.send({
-                                    //                 packageName2,
-                                    //                 input,
-                                    //                 output,
-                                    //                 socket
-                                    //             });
-                                    //             child.on('message', (data) => {
-                                    //                 for (key in data) {
-                                    //                     socket.emit('data-outport-' + id2 + '-' + key, data[key]);
-                                    //                     output.done();
-
-                                    //                 }
-                                    //             })
-                                    //         })
-                                    //     })
-                                    // } catch (error) {
-                                    //     console.log(err)
-                                    // }
-
                                 })
                             }
                             socket.on('data-outport-' + id + '-' + edge.startPort, function (data) {
                                 socket.emit('data-inport-' + id2 + '-' + edge.endPort, data);
                             })
+                            //initate graph after all the event listeners are assigned
+                            if (i === graph.edges.length - 1) {
+                                socket.emit('data-inport-' + startComponentId + '-' + 'in', '1234567890')
+                            }
 
                         })
                     }
