@@ -6,6 +6,7 @@ const util = require('../util');
 const {
     validate
 } = util
+const _ = require('underscore');
 
 module.exports = function () {
 
@@ -73,6 +74,50 @@ module.exports = function () {
 
                 graph.nodes[data.nodeId].metadata = { x: data.x, y: data.y };
                 graph.markModified('nodes');
+
+                services.graphService.saveGraph(graph).then((obj) => {
+
+                    console.log("Add metadata success");
+                    deferred.resolve(obj);
+
+                }, (err) => {
+
+                    console.log("Error adding metadata to node");
+                    deferred.reject(err);
+
+                })
+            }, (err) => {
+
+                console.log("Error finding graph");
+                deferred.reject(err);
+
+            })
+
+
+            return deferred.promise;
+
+        },
+
+        //add metadata to existing node
+        // @param  graphId : id of the graph
+        //         metadata : metadata of the node (eg: x,y coordinates)
+        //         nodeId : id of the node in the graph
+
+        deleteNode: function (data) {
+
+            console.log("delete node service");
+
+            var deferred = Q.defer();
+
+            services.graphService.getGraphById(data.graphId).then((graph) => { //fetch node and add metadat
+
+                delete graph.nodes[data.nodeId];
+                graph.markModified('nodes');
+                var edges = _.filter(graph.edges, (edge) => {
+                    return !(edge.startNode === data.nodeId || edge.endNode === data.nodeId)
+                })
+                graph.edges = edges;
+                graph.markModified('edges');
 
                 services.graphService.saveGraph(graph).then((obj) => {
 

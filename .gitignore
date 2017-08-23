@@ -71,3 +71,4 @@ DataServices.njsproj
 DataServices.v12.suo
 DataServices.v14.suo
 *.sln
+test/writetest.js

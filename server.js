@@ -14,14 +14,7 @@ var env = process.env.isHosted || false;
 mongoose.connect(env
 	? database.remoteUrl
 	: database.localUrl);
-app.use(function (req, res, next) {
-	var start = Date.now();
-	res.on('finish', function () {
-		var duration = Date.now() - start;
-		console.log(duration)
-	});
-	next();
-});
+
 app.use(cors()); //Access-Control-Allow-Origin header
 app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
@@ -44,11 +37,7 @@ app.use('/api', require('./api/node')())
 
 app.get('/status', function (req, res) {
 
-	//status api
-
-	res
-		.status(200)
-		.send({ message: 'OK' })
+	res.status(200).send({ message: 'OK' })
 })
 
 server.listen(port, function () {

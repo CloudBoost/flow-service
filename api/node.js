@@ -92,5 +92,39 @@ module.exports = function () {
 		}
 	})
 
+	router.delete('/graph/node', function (req, res) {
+
+		//add metdata to node
+		let {
+			graphId,
+			nodeId
+		} = req.body;
+
+		let data = {
+			graphId,
+			nodeId
+		};
+
+		if (validate(nodeId, "string"), validate(graphId, "string")) {
+
+			services.nodeService.deleteNode(data).then(function (result) {
+
+				console.log("Successfull added metadata to node");
+				return res.status(200).json(result);
+
+			}, function (error) {
+
+				console.log("Error adding metadata to node");
+				return res.send(500, error);
+
+			});
+
+		} else {
+
+			res.status(400).send('INVALID REQUEST')
+
+		}
+	})
+
 	return router
 }
