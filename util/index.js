@@ -15,7 +15,8 @@ exports.generateId = function () {
 	}
 	return "r" + id;
 };
-exports.builtInNpmPackages = ['assert',
+exports.builtInNpmPackages = [
+	'assert',
 	'buffer',
 	'child_process',
 	'cluster',
