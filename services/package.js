@@ -54,7 +54,7 @@ module.exports = function () {
                     }
                     if (files) {
                         files.forEach((file) => {
-                            components[file] = file;
+                            components[file] = file.substring(0, file.length - 3);
                         })
 
                         deferred.resolve({

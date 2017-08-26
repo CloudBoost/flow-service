@@ -137,7 +137,7 @@ module.exports = function () {
 
         //execute graph
 
-        executeGraph: function (route) {
+        executeGraph: function (route, initData) {
 
             console.log("executes graph service");
 
@@ -254,7 +254,8 @@ module.exports = function () {
                             })
                             //initate graph after all the event listeners are assigned
                             if (i === graph.edges.length - 1) {
-                                socket.emit('data-inport-' + startComponentId + '-' + 'in', '1234567890')
+                                console.log('1');
+                                socket.emit('data-inport-' + startComponentId + '-' + 'in', (initData || 'default value'))
                             }
 
                         })
