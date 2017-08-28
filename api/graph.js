@@ -125,7 +125,7 @@ module.exports = function () {
 	router.post('/graph/execute/:route', function (req, res) {
 		var start = Date.now();
 
-		services.graphService.executeGraph(req.params.route).then(function (result) {
+		services.graphService.executeGraph(req.params.route, req.body.data).then(function (result) {
 
 			console.log("graph executed successfully ");
 			var duration = Date.now() - start;

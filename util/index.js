@@ -13,5 +13,34 @@ exports.generateId = function () {
 	for (var i = 0; i < 8; i++) {
 		id = id + possible.charAt(Math.floor(Math.random() * possible.length));
 	}
-	return "r" + id;
+	return possible.charAt(Math.floor(Math.random() * (possible.length - 10))) + id;
 };
+exports.builtInNpmPackages = [
+	'assert',
+	'buffer',
+	'child_process',
+	'cluster',
+	'crypto',
+	'dgram',
+	'dns',
+	'domain',
+	'events',
+	'fs',
+	'http',
+	'https',
+	'net',
+	'os',
+	'path',
+	'punycode',
+	'querystring',
+	'readline',
+	'stream',
+	'string_decoder',
+	'tls',
+	'tty',
+	'url',
+	'util',
+	'v8',
+	'vm',
+	'zlib'
+]

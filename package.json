@@ -17,10 +17,12 @@
   "dependencies": {
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
-    "cbflow-end": "^1.0.0",
-    "cbflow-fs": "^1.0.5",
-    "cbflow-math": "^1.0.5",
-    "cbflow-string": "^1.0.5",
+    "cbflow-end": "^1.0.2",
+    "cbflow-fs": "^1.0.1",
+    "cbflow-math": "^1.0.6",
+    "cbflow-start": "^1.0.0",
+    "cbflow-string": "^1.0.1",
+    "cbflow-string2": "^1.0.1",
     "cloudboost-flow": "^2.0.12",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.3",
@@ -36,6 +38,7 @@
     "noflo-math": "^0.1.1",
     "npm-install-version": "^6.0.2",
     "q": "^1.5.0",
+    "underscore": "^1.8.3",
     "vm2": "^3.4.6"
   },
   "devDependencies": {}
